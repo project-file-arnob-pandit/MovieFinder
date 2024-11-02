@@ -5,10 +5,10 @@ import Navber from './Components/Navber';
 import { LuSun } from "react-icons/lu";
 import { BsMoonStarsFill } from "react-icons/bs";
 import MovieDetails from './Components/MovieDetails';
-import MovieWatch from './Components/MovieWatch';
 
 const App = () => {
   const [isDarkMode, setIsDarkMode] = useState(true);
+  const [resetSearch, setResetSearch] = useState(false);
   const [movies, setMovies] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -16,8 +16,6 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [watchingMovie, setWatchingMovie] = useState(null); // State to manage watching movie
-
 
   let key = "b71394cd13d80ad6d8cf2d34c075b584";
 
@@ -35,7 +33,6 @@ const App = () => {
 
       // Combine results from all pages and limit to 60 movies
       const movies = responses.flatMap(response => response.data.results).slice(0, 60);
-
       setMovies(movies);
       setTotalPages(responses[0].data.total_pages); // Assuming total_pages is the same across pages
     } catch (error) {
@@ -94,18 +91,23 @@ const App = () => {
 
   const moviesToDisplay = searchQuery ? searchResults : movies;
 
+  const handleReset = () => {
+    setMovies([]);
+    setSearchResults([]);
+    setSearchQuery('');  // Reset search query in the parent
+    setCurrentPage(1);
+    setResetSearch(true); // Trigger reset in Navbar
+    fetchMovies(1);
+  };
+
+
+
   return (
     <div className={`w-full min-h-screen p-3 flex flex-col items-center overflow-hidden ${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'}`}>
       <header className="w-full flex justify-between items-center mb-4 px-6 md:px-12">
         <h1
           className="text-[24px] md:text-[30px] cursor-pointer capitalize font-extralight"
-          onClick={() => {
-            setMovies([]);
-            setSearchResults([]);
-            setSearchQuery('');
-            setCurrentPage(1);
-            fetchMovies(1); // Optionally re-fetch the movies on reset
-          }}
+          onClick={handleReset}
         >
           Movie
         </h1>
@@ -114,7 +116,8 @@ const App = () => {
           {isDarkMode ? <BsMoonStarsFill /> : <LuSun />}
         </button>
       </header>
-      <Navber isDarkMode={isDarkMode} onSearch={handleSearch} />
+      <Navber isDarkMode={isDarkMode} onSearch={handleSearch} resetSearch={resetSearch}
+        setResetSearch={setResetSearch} />
       <section className="w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 p-4 overflow-hidden">
         {isLoading ? (
           <div className="col-span-full text-center">Loading...</div>
