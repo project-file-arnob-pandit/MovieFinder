@@ -2,14 +2,18 @@ import React, { useState } from 'react';
 
 const Navbar = ({ isDarkMode, onSearch }) => {
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (input.trim()) {
-      // Trigger the search action (could call an API or update a parent component's state)
-      onSearch(input);
+      setLoading(true); // Start loading
+      onSearch(input);  // Trigger the search action (API call or other action)
+      // Simulate a search delay for effect (e.g., for an API call)
+      setTimeout(() => {
+        setLoading(false); // Stop loading after search is done
+      }, 500);
     }
   };
-
   return (
     <div className="w-[90%] flex gap-2 px-4">
       <input
@@ -21,9 +25,14 @@ const Navbar = ({ isDarkMode, onSearch }) => {
       />
       <button
         onClick={handleSearch}
-        className={`px-4 capitalize font-serif rounded-md ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-600 text-white'}`}
+        disabled={loading}
+        className={`px-4 capitalize font-serif rounded-md flex items-center justify-center ${isDarkMode ? 'bg-gray-800 text-white' : 'bg-blue-600 text-white'}`}
       >
-        Search
+        {loading ? (
+          <span className="animate-spin border-2 border-t-transparent border-white rounded-full w-4 h-4"></span>
+        ) : (
+          'Search'
+        )}
       </button>
     </div>
   );
