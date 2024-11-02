@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-const Navbar = ({ isDarkMode, onSearch }) => {
+const Navbar = ({ isDarkMode, onSearch, resetSearch, setResetSearch }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (resetSearch) {
+      setInput('');       // Clear the input field
+      setResetSearch(false); // Reset the resetSearch flag in the parent
+    }
+  }, [resetSearch, setResetSearch]);
 
   const handleSearch = async () => {
     if (input.trim()) {
